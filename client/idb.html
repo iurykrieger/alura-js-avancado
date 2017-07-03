@@ -8,55 +8,6 @@
 </head>
 <body>
 	<script src="js/app/models/Negociacao.js"></script>
-	<script>
-		var connection;
-		var openRequest = window.indexedDB.open('aluraframe', 3);
-		openRequest.onupgradeneeded = e => {
-			console.log('OnUpgrade');
-			connection = e.target.result;
-			if(connection.objectStoreNames.contains('negociacoes')){
-				connection.deleteObjectStore('negociacoes');
-			}
-			connection.createObjectStore('negociacoes', {autoIncrement : true});
-		}
-		openRequest.onsuccess = e => {
-			console.log('Conexao obtida com sucesso!')
-			connection = e.target.result;
-		};
-		openRequest.onerror = e => console.log(`Deu pau : ${e.target.error}`);
-
-		function add(){
-			let store = connection.transaction(['negociacoes'], 'readwrite').objectStore('negociacoes');
-
-			let n = new Negociacao(new Date(), 1, 200);
-			let request = store.add(n);
-			request.onsuccess = e => {
-				console.log(n);
-			};
-			request.onerror = e => {
-				console.log('Deu pau ao incluir!');
-			};
-		}
-
-		function getAll(){
-			let store = connection.transaction(['negociacoes'], 'readwrite').objectStore('negociacoes');
-			let cursor = store.openCursor();
-			let negociacoes = [];
-			cursor.onsuccess = e => {
-				let actual = e.target.result;
-				if(actual){
-					var n = actual.value;
-					negociacoes.push(new Negociacao(n._data, n._quantidade, n._valor));
-					actual.continue();
-				}else{
-					console.log(negociacoes);
-				}
-			};
-			cursor.onerror = e => {
-				console.log(e.target.error.name);
-			};
-			
-		}
-	</script>
+	<script src="js/app/factories/ConnectionFactory.js"></script>
 </body>
 </html>
