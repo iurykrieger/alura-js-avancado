@@ -4,6 +4,7 @@ class NecociacaoController {
 		this._inputData = $('#data');
 		this._inputQuantidade = $('#quantidade');
 		this._inputValor = $('#valor');
+		this._actualColumn = '';
 		this._service = new NegociacaoService();
 		this._mensagem = new Bind(new Mensagem(), new MensagemView($('#mensagemView')), 'texto');
 		this._negociacoesList = new Bind(
@@ -14,26 +15,31 @@ class NecociacaoController {
 			'orderBy',
 			'reverse'
 		);
-		this._actualColumn = '';
+		this._loadAll();
 	}
 
 	add(event) {
 		event.preventDefault();
 		ConnectionFactory.getConnection()
-			.then(connection => {
-				console.log(connection);
-				new NegociacaoDao(connection).save(this._createNegociacao()).then(negociacao => {
-					this._negociacoesList.add(negociacao);
-					this._mensagem.texto = 'Negociação adicionada com sucesso!';
-					this._cleanForm();
-				});
+			.then(connection => new NegociacaoDao(connection))
+			.then(dao => dao.save(this._createNegociacao()))
+			.then(negociacao => {
+				this._negociacoesList.add(negociacao);
+				this._mensagem.texto = 'Negociação adicionada com sucesso!';
+				this._cleanForm();
 			})
 			.catch(error => (this._mensagem.texto = error));
 	}
 
 	remove(event) {
-		this._negociacoesList.clean();
-		this._mensagem.texto = 'Negociações apagadas com sucesso!';
+		ConnectionFactory.getConnection()
+			.then(connection => new NegociacaoDao(connection))
+			.then(dao => dao.deleteAll())
+			.then(message => {
+				this._negociacoesList.clean();
+				this._mensagem.texto = message;
+			})
+			.catch(error => (this._mensagem.texto = error));
 	}
 
 	import(event) {
@@ -43,10 +49,7 @@ class NecociacaoController {
 				negociacoes.forEach(negociacao => this._negociacoesList.add(negociacao));
 				this._mensagem.texto = 'Negociações do período importadas com sucesso';
 			})
-			.catch(error => {
-				console.log(error);
-				this._mensagem.texto = error;
-			});
+			.catch(error => (this._mensagem.texto = error));
 	}
 
 	orderBy(column) {
@@ -71,5 +74,13 @@ class NecociacaoController {
 		this._inputQuantidade.value = 1;
 		this._inputValor.value = 0.0;
 		this._inputData.focus();
+	}
+
+	_loadAll() {
+		ConnectionFactory.getConnection()
+			.then(connection => new NegociacaoDao(connection))
+			.then(dao => dao.getAll())
+			.then(negociacoes => negociacoes.forEach(negociacao => this._negociacoesList.add(negociacao)))
+			.catch(error => (this._mensagem.texto = error));
 	}
 }
