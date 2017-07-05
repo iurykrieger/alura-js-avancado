@@ -15,14 +15,29 @@ class NecociacaoController {
 			'orderBy',
 			'reverse'
 		);
-		this._loadAll();
+		this._init();
+	}
+
+	_init() {
+		this.load();
+		setInterval(() => {
+			this.import();
+		}, 1000);
+	}
+
+	load() {
+		this._service
+			.loadAll()
+			.then(negociacoes =>
+				negociacoes.forEach(negociacao => this._negociacoesList.add(negociacao))
+			)
+			.catch(error => (this._mensagem.texto = error));
 	}
 
 	add(event) {
 		event.preventDefault();
-		ConnectionFactory.getConnection()
-			.then(connection => new NegociacaoDao(connection))
-			.then(dao => dao.save(this._createNegociacao()))
+		this._service
+			.save(this._createNegociacao())
 			.then(negociacao => {
 				this._negociacoesList.add(negociacao);
 				this._mensagem.texto = 'Negociação adicionada com sucesso!';
@@ -32,9 +47,8 @@ class NecociacaoController {
 	}
 
 	remove(event) {
-		ConnectionFactory.getConnection()
-			.then(connection => new NegociacaoDao(connection))
-			.then(dao => dao.deleteAll())
+		this._service
+			.deleteAll()
 			.then(message => {
 				this._negociacoesList.clean();
 				this._mensagem.texto = message;
@@ -42,9 +56,9 @@ class NecociacaoController {
 			.catch(error => (this._mensagem.texto = error));
 	}
 
-	import(event) {
+	import() {
 		this._service
-			.getAllNegociacoes()
+			.import(this._negociacoesList)
 			.then(negociacoes => {
 				negociacoes.forEach(negociacao => this._negociacoesList.add(negociacao));
 				this._mensagem.texto = 'Negociações do período importadas com sucesso';
@@ -74,13 +88,5 @@ class NecociacaoController {
 		this._inputQuantidade.value = 1;
 		this._inputValor.value = 0.0;
 		this._inputData.focus();
-	}
-
-	_loadAll() {
-		ConnectionFactory.getConnection()
-			.then(connection => new NegociacaoDao(connection))
-			.then(dao => dao.getAll())
-			.then(negociacoes => negociacoes.forEach(negociacao => this._negociacoesList.add(negociacao)))
-			.catch(error => (this._mensagem.texto = error));
 	}
 }

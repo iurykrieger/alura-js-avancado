@@ -26,4 +26,10 @@ class NegociacaoList {
 	reverse() {
 		this._negociacoes.reverse();
 	}
+
+	exists(negociacao) {
+		return this._negociacoes.some(
+			existentNegociacao => JSON.stringify(negociacao) == JSON.stringify(existentNegociacao)
+		);
+	}
 }

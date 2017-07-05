@@ -8,10 +8,12 @@ class NegociacaoService {
 		return Promise.all([
 			this.getWeekNegociacoes(),
 			this.getLastWeekNegociacoes(),
-			this.getLastWeekBeforeNegociacoes(),
+			this.getLastWeekBeforeNegociacoes()
 		])
-		.then(negociacoes => negociacoes.reduce((flatArray, array) => flatArray.concat(array), []))
-		.catch(error => new Error(error));
+			.then(negociacoes =>
+				negociacoes.reduce((flatArray, array) => flatArray.concat(array), [])
+			)
+			.catch(error => new Error(error));
 	}
 
 	getWeekNegociacoes() {
@@ -48,5 +50,32 @@ class NegociacaoService {
 				console.log(xhr.responseText);
 				throw new Error('Não foi possível obter as negociações da semana.');
 			});
+	}
+
+	save(negociacao) {
+		return ConnectionFactory.getConnection()
+			.then(connection => new NegociacaoDao(connection))
+			.then(dao => dao.save(negociacao))
+			.catch(error => new Error(error));
+	}
+
+	deleteAll() {
+		return ConnectionFactory.getConnection()
+			.then(connection => new NegociacaoDao(connection))
+			.then(dao => dao.deleteAll())
+			.catch(error => new Error(error));
+	}
+
+	loadAll() {
+		return ConnectionFactory.getConnection()
+			.then(connection => new NegociacaoDao(connection))
+			.then(dao => dao.getAll())
+			.catch(error => new Error(error));
+	}
+
+	import(list) {
+		return this.getAllNegociacoes()
+			.then(negociacoes => negociacoes.filter(newNegociacao => !list.exists(newNegociacao)))
+			.catch(error => new Error(error));
 	}
 }
