@@ -12,7 +12,7 @@ class NegociacaoDao {
 				.add(negociacao);
 			request.onsuccess = e => resolve(negociacao);
 			request.onerror = e => {
-				console.log(e.target.error);
+			console.log(e.target.error);
 				reject('Não foi possível adicionar a negociação.');
 			};
 		});
