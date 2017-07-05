@@ -54,3 +54,4 @@ var NegociacaoList = function () {
 
 	return NegociacaoList;
 }();
+//# sourceMappingURL=NegociacaoList.js.map

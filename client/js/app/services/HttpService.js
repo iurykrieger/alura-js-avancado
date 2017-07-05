@@ -47,3 +47,4 @@ var HttpService = function () {
 
 	return HttpService;
 }();
+//# sourceMappingURL=HttpService.js.map
