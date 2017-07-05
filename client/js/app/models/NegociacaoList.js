@@ -28,8 +28,8 @@ class NegociacaoList {
 	}
 
 	exists(negociacao) {
-		return this._negociacoes.some(
-			existentNegociacao => JSON.stringify(negociacao) == JSON.stringify(existentNegociacao)
+		return this._negociacoes.some(existentNegociacao =>
+			existentNegociacao.isEquals(negociacao)
 		);
 	}
 }
