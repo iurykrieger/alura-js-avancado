@@ -1,7 +1,8 @@
-class NegociacoesView extends View {
+import { View } from './View';
 
-  template(model) {
-    return `
+export class NegociacoesView extends View {
+	template(model) {
+		return `
         <table class="table table-hover table-bordered">
             <thead>
                 <tr>
@@ -12,14 +13,18 @@ class NegociacoesView extends View {
                 </tr>
             </thead>  
             <tbody>
-                ${model.negociacoes.map(negociacao => `
+                ${model.negociacoes
+					.map(
+						negociacao => `
                   <tr>
                       <td>${DateHelper.dateToText(negociacao.data)}</td>
                       <td>${negociacao.quantidade}</td>
                       <td>${negociacao.valor}</td>
                       <td>${negociacao.volume}</td>
                   </tr>
-                `).join('')}
+                `
+					)
+					.join('')}
             </tbody>
             <tfoot>
               <td colspan="3">Total</td>
@@ -27,5 +32,5 @@ class NegociacoesView extends View {
             </tfoot>
         </table>
       `;
-  }
+	}
 }
